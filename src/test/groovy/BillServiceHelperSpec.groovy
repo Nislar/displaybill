@@ -1,4 +1,5 @@
 import domain.Bill
+import org.apache.commons.lang.RandomStringUtils
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.client.MockRestServiceServer
@@ -14,52 +15,95 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 class BillServiceHelperSpec extends Specification {
 
-    BillServiceHelper billServiceHelper = new BillServiceHelper()
+    static final String DATE_FORMAT = "yyyy-MM-dd"
 
-    def 'Successfully fetch bill from web service'() {
-        given: ''
+    BillServiceHelper billServiceHelper = new BillServiceHelper()
+    MockRestServiceServer mockServer
+
+    String generatedDate
+    String dueDate
+    String fromDate
+    String toDate
+    String totalCost
+    String subscriptionName
+    String subscriptionCost
+    String subscriptionTotalCost
+    String calledNumber
+    String duration
+    String callCost
+    String callTotalCost
+    String filmName
+    String filmCost
+    String storeTotalCost
+
+    void setup() {
+        mockServer = MockRestServiceServer.createServer(billServiceHelper.restTemplate)
+        Random random = new Random()
+
+        generatedDate = new Date(random.nextInt()).format(DATE_FORMAT)
+        dueDate = new Date(random.nextInt()).format(DATE_FORMAT)
+        fromDate = new Date(random.nextInt()).format(DATE_FORMAT)
+        toDate = new Date(random.nextInt()).format(DATE_FORMAT)
+        totalCost = RandomStringUtils.randomNumeric(3) + '.' + RandomStringUtils.randomNumeric(2)
+
+        subscriptionName = RandomStringUtils.randomAlphabetic(20)
+        subscriptionCost = RandomStringUtils.randomNumeric(2) + '.' + RandomStringUtils.randomNumeric(2)
+        subscriptionTotalCost = RandomStringUtils.randomNumeric(2) + '.' + RandomStringUtils.randomNumeric(2)
+
+        calledNumber = RandomStringUtils.randomNumeric(10)
+        duration = RandomStringUtils.randomNumeric(2) + ':' + RandomStringUtils.randomNumeric(2) + ':' + RandomStringUtils.randomNumeric(2)
+        callCost = RandomStringUtils.randomNumeric(2) + '.' + RandomStringUtils.randomNumeric(2)
+        callTotalCost = RandomStringUtils.randomNumeric(2) + '.' + RandomStringUtils.randomNumeric(2)
+
+        filmName = RandomStringUtils.randomAlphabetic(15)
+        filmCost = RandomStringUtils.randomNumeric(1) + '.' + RandomStringUtils.randomNumeric(2)
+        storeTotalCost = RandomStringUtils.randomNumeric(2) + '.' + RandomStringUtils.randomNumeric(2)
+    }
+
+    def 'Successfully fetch the bill from web service'() {
+        given: 'The customer has a bill to return'
         String returnedBill = '{\n' +
                 '  "statement": {\n' +
-                '    "generated": "2015-08-01",\n' +
-                '    "due": "2015-01-25",\n' +
+                '    "generated": "' + generatedDate + '",\n' +
+                '    "due": "' + dueDate + '",\n' +
                 '    "period": {\n' +
-                '      "from": "2015-01-26",\n' +
-                '      "to": "2015-02-25"\n' +
+                '      "from": "' + fromDate + '",\n' +
+                '      "to": "' + toDate + '"\n' +
                 '    }\n' +
                 '  },\n' +
-                '  "total": 136.03,\n' +
+                '  "total": ' + totalCost + ',\n' +
                 '  "package": {\n' +
                 '    "subscriptions": [\n' +
-                '      { "type": "tv", "name": "Variety with Movies HD", "cost": 50.00 },\n' +
-                '      { "type": "broadband", "name": "Fibre Unlimited", "cost": 16.40 }\n' +
+                '      { "type": "tv", "name": "' + subscriptionName + '", "cost": ' + subscriptionCost + ' },\n' +
+                '      { "type": "broadband", "name": "' + subscriptionName + '", "cost": ' + subscriptionCost + ' }\n' +
                 '    ],\n' +
-                '    "total": 71.40\n' +
+                '    "total": ' + subscriptionTotalCost + '\n' +
                 '  },\n' +
                 '  "callCharges": {\n' +
                 '    "calls": [\n' +
-                '      { "called": "07716393769", "duration": "00:23:03", "cost": 2.13 },\n' +
-                '      { "called": "07716393769", "duration": "00:23:03", "cost": 2.13 },\n' +
-                '      { "called": "07716393769", "duration": "00:23:03", "cost": 2.13 },\n' +
-                '      { "called": "02074351359", "duration": "00:23:03", "cost": 2.13 }\n' +
+                '      { "called": "' + calledNumber + '", "duration": "' + duration + '", "cost": ' + callCost + ' },\n' +
+                '      { "called": "' + calledNumber + '", "duration": "' + duration + '", "cost": ' + callCost + ' },\n' +
+                '      { "called": "' + calledNumber + '", "duration": "' + duration + '", "cost": ' + callCost + ' },\n' +
+                '      { "called": "' + calledNumber + '", "duration": "' + duration + '", "cost": ' + callCost + ' }\n' +
                 '    ],\n' +
-                '    "total": 59.64\n' +
+                '    "total": ' + callTotalCost + '\n' +
                 '  },\n' +
                 '  "skyStore": {\n' +
                 '    "rentals": [\n' +
-                '      { "title": "Film 4", "cost": 4.99 },\n' +
-                '      { "title": "Film 5", "cost": 4.99 }\n' +
+                '      { "title": "' + filmName + '", "cost": ' + filmCost + ' },\n' +
+                '      { "title": "' + filmName + '", "cost": ' + filmCost + ' }\n' +
                 '    ],\n' +
                 '    "buyAndKeep": [\n' +
-                '      { "title": "Film 1", "cost": 9.99 },\n' +
-                '      { "title": "Film 2", "cost": 9.99 },\n' +
-                '      { "title": "Film 3", "cost": 9.99 }\n' +
+                '      { "title": "' + filmName + '", "cost": ' + filmCost + ' },\n' +
+                '      { "title": "' + filmName + '", "cost": ' + filmCost + ' },\n' +
+                '      { "title": "' + filmName + '", "cost": ' + filmCost + ' }\n' +
                 '    ],\n' +
-                '    "total": 24.97\n' +
+                '    "total": ' + storeTotalCost + '\n' +
                 '  }\n' +
                 '}'
 
         when: 'The web service is called'
-        MockRestServiceServer mockServer = MockRestServiceServer.createServer(billServiceHelper.restTemplate)
+//        MockRestServiceServer mockServer = MockRestServiceServer.createServer(billServiceHelper.restTemplate)
         mockServer.expect(requestTo(BillServiceHelper.URL))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(returnedBill, MediaType.APPLICATION_JSON))
@@ -69,10 +113,45 @@ class BillServiceHelperSpec extends Specification {
         println bill
 
         then: 'The customers bill is successfully retrieved'
-        bill.generated == '2015-08-01'
+        and: 'The generated date is correct'
+        bill.generated == generatedDate
+
+        and: 'The due date is correct'
+        bill.dueDate == dueDate
+
+        and: 'The start date is correct'
+        bill.startDate == fromDate
+
+        and: 'The end date is correct'
+        bill.endDate == toDate
+
+        and: 'The total cost is correct'
+        bill.totalCost == new BigDecimal(totalCost)
+
+        and: 'The calls are correct'
         bill.calls.size() == 4
+        bill.callTotalCost == new BigDecimal(callTotalCost)
+        bill.calls.first().calledNumber == calledNumber
+        bill.calls.first().cost == new BigDecimal(callCost)
+        bill.calls.first().duration == duration
+
+        and: 'The purchases are correct'
+        bill.storeTotalCost == new BigDecimal(storeTotalCost)
         bill.buyAndKeep.size() == 3
+        bill.buyAndKeep.first().title == filmName
+        bill.buyAndKeep.first().cost == new BigDecimal(filmCost)
+
+        and: 'The rentals are correct'
         bill.rentals.size() == 2
+        bill.buyAndKeep.first().title == filmName
+        bill.buyAndKeep.first().cost == new BigDecimal(filmCost)
+
+        and: 'The package subscriptions are correct'
         bill.subscriptions.size() == 2
+        bill.subscriptionTotalCost == new BigDecimal(subscriptionTotalCost)
+        bill.subscriptions.first().cost == new BigDecimal(subscriptionCost)
+        bill.subscriptions.first().name == subscriptionName
+        bill.subscriptions.first().type == 'tv'
+        bill.subscriptions.last().type == 'broadband'
     }
 }

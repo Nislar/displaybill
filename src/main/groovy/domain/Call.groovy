@@ -14,5 +14,5 @@ class Call {
 
     String calledNumber
     String duration
-    String cost
+    BigDecimal cost
 }

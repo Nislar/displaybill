@@ -18,12 +18,12 @@ class Bill {
     String dueDate
     String startDate
     String endDate
-    String totalCost
+    BigDecimal totalCost
     List<Subscription> subscriptions
-    String subscriptionTotalCost
+    BigDecimal subscriptionTotalCost
     List<Call> calls
-    String callTotalCost
+    BigDecimal callTotalCost
     List<Film> rentals
     List<Film> buyAndKeep
-    String storeTotalCost
+    BigDecimal storeTotalCost
 }

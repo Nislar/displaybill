@@ -13,5 +13,5 @@ import groovy.transform.Canonical
 class Film {
 
     String title
-    String cost
+    BigDecimal cost
 }

@@ -14,5 +14,5 @@ class Subscription {
 
     String type
     String name
-    String cost
+    BigDecimal cost
 }

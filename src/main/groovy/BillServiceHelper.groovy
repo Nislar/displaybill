@@ -30,7 +30,11 @@ class BillServiceHelper {
         HttpEntity entity = new HttpEntity<String>("", new HttpHeaders(all: headers))
         ResponseEntity<String> responseEntity = restTemplate.exchange(URL, HttpMethod.GET, entity, String)
 
+        println 'Response = ' + responseEntity
+
         def responseBody = new JsonSlurper().parseText(responseEntity.body)
+
+        println 'Body = ' + responseBody
 
         new Bill(callTotalCost: responseBody.callCharges.total,
                 dueDate: responseBody.statement.due,
