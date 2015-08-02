@@ -4,6 +4,21 @@
 
 This will display a customers sky bill.
 
+## Dependencies
+
+Groovy 2.4.4
+Grails 3.0.4
+Gradle 2.4
+Java 8
+Spring Boot 1.2.5
+
+## Usage
+
+* Checkout code from repository
+* Build using 'gradle build'
+* Run using 'gradle bootrun'
+* Go to 'localhost:8080/displayBill/index'
+
 ## Acceptance behaviour
 
 **In order to** check my bill  
