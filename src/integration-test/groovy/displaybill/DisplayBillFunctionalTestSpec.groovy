@@ -5,7 +5,7 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 
 /**
- * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
+ * Functional test for the display bill page.
  */
 @Integration
 @Rollback
@@ -53,6 +53,7 @@ class DisplayBillFunctionalTestSpec extends GebSpec {
 //        then: 'The type, name and cost is displayed for all package subscriptions'
         // todo - the check below refuses to work even though it works when entered into the browser even if the panel is closed
         // If the panel is started open it works, but not when the panel is started closed.
+        // The click event above should be opening the panel, but it's possible it might not be
 //        waitFor(10) {
 //            $('li.tv h5 span.subscriptionDetail').text() == 'Variety with Movies HD for GBP50.00'
 //        }
