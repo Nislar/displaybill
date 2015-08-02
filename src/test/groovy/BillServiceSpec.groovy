@@ -1,23 +1,23 @@
-import domain.Bill
 import org.apache.commons.lang.RandomStringUtils
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.client.MockRestServiceServer
 import spock.lang.Specification
+
+import java.text.SimpleDateFormat
+
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 
 /**
- * Unit test class for {@link BillServiceHelper}. Will mock out calls to web service so a test bill can be returned.
+ * Unit test class for {@link BillService}. Will mock out calls to web service so a test bill can be returned.
  *
  * Created by Robert Clayforth on 01/08/2015.
  */
-class BillServiceHelperSpec extends Specification {
+class BillServiceSpec extends Specification {
 
-    static final String DATE_FORMAT = "yyyy-MM-dd"
-
-    BillServiceHelper billServiceHelper = new BillServiceHelper()
+    BillService billService = new BillService()
     MockRestServiceServer mockServer
 
     String generatedDate
@@ -37,13 +37,13 @@ class BillServiceHelperSpec extends Specification {
     String storeTotalCost
 
     void setup() {
-        mockServer = MockRestServiceServer.createServer(billServiceHelper.restTemplate)
+        mockServer = MockRestServiceServer.createServer(billService.restTemplate)
         Random random = new Random()
 
-        generatedDate = new Date(random.nextInt()).format(DATE_FORMAT)
-        dueDate = new Date(random.nextInt()).format(DATE_FORMAT)
-        fromDate = new Date(random.nextInt()).format(DATE_FORMAT)
-        toDate = new Date(random.nextInt()).format(DATE_FORMAT)
+        generatedDate = new Date(random.nextInt()).format(BillService.DATE_FORMAT)
+        dueDate = new Date(random.nextInt()).format(BillService.DATE_FORMAT)
+        fromDate = new Date(random.nextInt()).format(BillService.DATE_FORMAT)
+        toDate = new Date(random.nextInt()).format(BillService.DATE_FORMAT)
         totalCost = RandomStringUtils.randomNumeric(3) + '.' + RandomStringUtils.randomNumeric(2)
 
         subscriptionName = RandomStringUtils.randomAlphabetic(20)
@@ -103,27 +103,24 @@ class BillServiceHelperSpec extends Specification {
                 '}'
 
         when: 'The web service is called'
-//        MockRestServiceServer mockServer = MockRestServiceServer.createServer(billServiceHelper.restTemplate)
-        mockServer.expect(requestTo(BillServiceHelper.URL))
+        mockServer.expect(requestTo(BillService.URL))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(returnedBill, MediaType.APPLICATION_JSON))
 
-        Bill bill = billServiceHelper.fetchCustomersLatestBill()
-
-        println bill
+        Bill bill = billService.fetchCustomersLatestBill()
 
         then: 'The customers bill is successfully retrieved'
         and: 'The generated date is correct'
-        bill.generated == generatedDate
+        bill.generated == new SimpleDateFormat(BillService.DATE_FORMAT).parse(generatedDate)
 
         and: 'The due date is correct'
-        bill.dueDate == dueDate
+        bill.dueDate == new SimpleDateFormat(BillService.DATE_FORMAT).parse(dueDate)
 
         and: 'The start date is correct'
-        bill.startDate == fromDate
+        bill.startDate == new SimpleDateFormat(BillService.DATE_FORMAT).parse(fromDate)
 
         and: 'The end date is correct'
-        bill.endDate == toDate
+        bill.endDate == new SimpleDateFormat(BillService.DATE_FORMAT).parse(toDate)
 
         and: 'The total cost is correct'
         bill.totalCost == new BigDecimal(totalCost)

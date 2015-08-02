@@ -1,8 +1,6 @@
-package domain
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import groovy.transform.ToString
-import groovy.transform.Canonical
+
+import java.text.DecimalFormat
 
 /**
  * Domain object representing a customers bill for a set date range.
@@ -10,14 +8,12 @@ import groovy.transform.Canonical
  * Created by Robert Clayforth on 01/08/2015.
  */
 @ToString
-@Canonical
-@JsonIgnoreProperties(ignoreUnknown = true)
 class Bill {
 
-    String generated
-    String dueDate
-    String startDate
-    String endDate
+    Date generated
+    Date dueDate
+    Date startDate
+    Date endDate
     BigDecimal totalCost
     List<Subscription> subscriptions
     BigDecimal subscriptionTotalCost
@@ -26,4 +22,11 @@ class Bill {
     List<Film> rentals
     List<Film> buyAndKeep
     BigDecimal storeTotalCost
+
+    static hasMany = [
+            subscriptions: Subscription,
+            calls: Call,
+            rentals: Film,
+            buyAndKeep: Film
+    ]
 }
